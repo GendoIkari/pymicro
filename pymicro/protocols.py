@@ -1,12 +1,13 @@
 from flask import Flask, jsonify, request
+import requests
 
 class HTTP:
     def __init__(self, host=None, port=None):
         self.host = host
         self.port = port
-        self.app = Flask(__name__)
 
-    def setup(self, endpoints):
+    def setup_serve(self, endpoints):
+        self.app = Flask(__name__)
         for endpoint in endpoints:
             self.app.add_url_rule(**self.create_rule(endpoint))
 
@@ -17,6 +18,9 @@ class HTTP:
             'view_func': endpoint,
             'methods': ['POST'],
         }
+
+    def request(self, endpoint, **kwargs):
+        return requests.post('http://' + self.host + ':' + str(self.port) + '/' + endpoint, json=kwargs).json()
 
     def process_request(self, endpoint):
         return request.get_json()
