@@ -21,7 +21,6 @@ class HTTP:
             'view_func': endpoint,
         }
 
-
     def run(self):
         self.app.run(
             host=self.host,
