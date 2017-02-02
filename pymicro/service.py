@@ -1,10 +1,4 @@
-class EndPoint:
-    def __init__(self, function):
-        self.function = function
-
-    def __call__(self, *args, **kwargs):
-        print('endpoint')
-        return self.function(*args, **kwargs)
+from pymicro.endpoint import EndPoint
 
 class Service:
     name = ''
@@ -12,11 +6,9 @@ class Service:
     endpoints = []
 
     @staticmethod
-    def setup(**config):
-        assert 'name' in config, '"name" key is mandatory to setup Service'
-        assert 'protocol' in config, '"protocol" key is mandatory to setup Service'
-        Service.name = config['name']
-        Service.protocol = config['protocol']()
+    def setup(name, protocol):
+        Service.name = name
+        Service.protocol = protocol
 
     @staticmethod
     def run():
@@ -25,6 +17,6 @@ class Service:
 
     @staticmethod
     def endpoint(f):
-        endpoint = EndPoint(f)
+        endpoint = EndPoint(Service.protocol, f)
         Service.endpoints.append(endpoint)
         return endpoint
