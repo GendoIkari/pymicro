@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 
 class HTTP:
     def __init__(self, host=None, port=None):
@@ -20,6 +20,9 @@ class HTTP:
             'rule': rule,
             'view_func': endpoint,
         }
+
+    def process_response(self, payload):
+        return jsonify(payload)
 
     def run(self):
         self.app.run(
