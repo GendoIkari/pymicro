@@ -5,17 +5,7 @@ class EndPoint:
         self.protocol = protocol
         self.function = function
         self.name = function.__name__
+        self.args = inspect.getargspec(function)[0]
 
     def __call__(self, *args, **kwargs):
         return self.function(*args, **kwargs)
-
-    def rule(self):
-        rule = '/' + '/'.join([
-            self.name,
-            *['<' + arg + '>' for arg in inspect.getargspec(self.function)[0]],
-        ])
-        return {
-            'endpoint': self.name,
-            'rule': rule,
-            'view_func': self,
-        }
