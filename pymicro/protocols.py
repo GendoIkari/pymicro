@@ -2,9 +2,10 @@ from flask import Flask, jsonify, request
 import requests
 
 class HTTP:
-    def __init__(self, host=None, port=None):
+    def __init__(self, host=None, port=None, ssl=False):
         self.host = host
         self.port = port
+        self.ssl = ssl
 
     def setup_serve(self, endpoints):
         self.app = Flask(__name__)
