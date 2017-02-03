@@ -16,8 +16,8 @@ class EndPoint:
         self.args = inspect.getargspec(function)[0]
 
     def __call__(self, *args, **kwargs):
-        request = self.protocol.process_request(self)
-        response = self.function(*args, **request, **kwargs)
+        request = self.protocol.process_request(self, *args, **kwargs)
+        response = self.function(**request)
         assert serializable(response, 'An endpoint must return a serializable object')
 
         return self.protocol.process_response(response)
