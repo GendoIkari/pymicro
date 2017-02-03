@@ -2,12 +2,12 @@ from pymicro.services import Service, RemoteService
 from pymicro.protocols.http import HTTP
 import datetime
 
-Service.setup(
+service = Service(
     name='ping',
     protocol=HTTP(port=5000)
 )
 
-@Service.endpoint
+@service.endpoint
 def ping(delay):
     pong = RemoteService(
         protocol=HTTP(host='localhost', port=5001)
@@ -22,4 +22,4 @@ def ping(delay):
     }
 
 if __name__ == '__main__':
-    Service.run()
+    service.run()

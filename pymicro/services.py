@@ -1,24 +1,18 @@
 from pymicro.endpoint import EndPoint
 
 class Service:
-    name = ''
-    protocol = None
-    endpoints = []
+    def __init__(self, name, protocol):
+        self.name = name
+        self.protocol = protocol
+        self.endpoints = []
 
-    @staticmethod
-    def setup(name, protocol):
-        Service.name = name
-        Service.protocol = protocol
+    def run(self):
+        self.protocol.setup_serve(self.endpoints)
+        self.protocol.run()
 
-    @staticmethod
-    def run():
-        Service.protocol.setup_serve(Service.endpoints)
-        Service.protocol.run()
-
-    @staticmethod
-    def endpoint(f):
-        endpoint = EndPoint(Service.protocol, f)
-        Service.endpoints.append(endpoint)
+    def endpoint(self, f):
+        endpoint = EndPoint(self.protocol, f)
+        self.endpoints.append(endpoint)
         return endpoint
 
 class RemoteService:

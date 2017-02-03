@@ -3,12 +3,12 @@ from pymicro.protocols.http import HTTP
 import time
 import datetime
 
-Service.setup(
+service = Service(
     name='pong',
     protocol=HTTP(port=5001),
 )
 
-@Service.endpoint
+@service.endpoint
 def pong(delay):
     time.sleep(delay)
     return {
@@ -16,4 +16,4 @@ def pong(delay):
     }
 
 if __name__ == '__main__':
-    Service.run()
+    service.run()
