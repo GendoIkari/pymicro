@@ -4,7 +4,7 @@ import time
 import datetime
 
 Service.setup(
-    name='vm-spawner',
+    name='pong',
     protocol=HTTP(port=5001),
 )
 

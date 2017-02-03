@@ -3,7 +3,7 @@ from pymicro.protocols.http import HTTP
 import datetime
 
 Service.setup(
-    name='vm-spawner',
+    name='ping',
     protocol=HTTP(port=5000)
 )
 
