@@ -21,7 +21,10 @@ class HTTP:
         }
 
     def request(self, endpoint, **kwargs):
-        return requests.post('http://' + self.host + ':' + str(self.port) + '/' + endpoint, json=kwargs).json()
+        schema = 'https' if self.ssl else 'http'
+        address = self.host + ':' + str(self.port)
+        url = '{}://{}/{}'.format(schema, address, endpoint)
+        return requests.post(url, json=kwargs).json()
 
     def process_request(self, endpoint):
         return request.get_json()
