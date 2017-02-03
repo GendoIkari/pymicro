@@ -5,7 +5,7 @@ import datetime
 
 service = Service(
     name='pong',
-    protocol=RabbitMQ(url='amqp://kpoqhwjx:zvPltTNyxErzdnsxGMMYyGe0EerdNcGC@antelope.rmq.cloudamqp.com/kpoqhwjx'),
+    protocol=RabbitMQ(url='amqp://'),
 )
 
 @service.endpoint
