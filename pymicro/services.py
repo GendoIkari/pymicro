@@ -15,6 +15,9 @@ class Service:
         self.endpoints.append(endpoint)
         return endpoint
 
+    def __del__(self):
+        self.protocol.close()
+
 class RemoteService:
     class RequestedFunction:
         def __init__(self, endpoint, protocol):
@@ -29,3 +32,6 @@ class RemoteService:
 
     def __getattr__(self, function):
         return RemoteService.RequestedFunction(function, self.protocol)
+
+    def __del__(self):
+        self.protocol.close()

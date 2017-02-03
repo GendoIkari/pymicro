@@ -37,3 +37,6 @@ class HTTP:
             host=self.host,
             port=self.port
         )
+
+    def close(self):
+        pass
