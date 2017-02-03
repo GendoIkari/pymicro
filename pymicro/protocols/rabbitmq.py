@@ -3,10 +3,10 @@ import uuid
 import json
 
 class RabbitMQ:
+    MAGIC_RESPONSE_PARM = '_pymicro_response_queue'
     def __init__(self, url):
         parms = pika.URLParameters(url)
         self.url = url
-        self.uuid = uuid.uuid4()
         self.temporary_response_queue = None
         self.mq_connection = pika.BlockingConnection(parms)
         self.mq_channel = self.mq_connection.channel()
@@ -16,9 +16,6 @@ class RabbitMQ:
             self.mq_channel.queue_declare(queue=endpoint.name)
             self.mq_channel.basic_consume(endpoint, queue=endpoint.name)
 
-    def response_queue(self, endpoint_name):
-        return '{}-{}'.format(endpoint_name, self.uuid)
-
     def request(self, endpoint, **kwargs):
         class WaitResponse:
             def __call__(self, channel, method, properties, body):
@@ -27,9 +24,10 @@ class RabbitMQ:
                 channel.queue_delete(queue=method.routing_key)
                 channel.basic_ack(delivery_tag=method.delivery_tag)
 
+        response_queue = uuid.uuid4().hex
+        kwargs[RabbitMQ.MAGIC_RESPONSE_PARM] = response_queue
+        self.mq_channel.queue_declare(queue=response_queue)
         self.mq_channel.queue_declare(queue=endpoint)
-        self.mq_channel.queue_declare(queue=self.response_queue(endpoint))
-        kwargs['_pymicro_response_queue'] = self.response_queue(endpoint)
 
         self.mq_channel.basic_publish(
             exchange='',
@@ -38,14 +36,14 @@ class RabbitMQ:
         )
 
         response = WaitResponse()
-        self.mq_channel.basic_consume(response, queue=self.response_queue(endpoint))
+        self.mq_channel.basic_consume(response, queue=response_queue)
         self.mq_channel.start_consuming()
         return json.loads(response.body.decode("utf-8"))
 
     def process_request(self, endpoint, channel, method, properties, body):
         data = json.loads(body.decode("utf-8"))
-        self.temporary_response_queue = data['_pymicro_response_queue']
-        del data['_pymicro_response_queue']
+        self.temporary_response_queue = data[RabbitMQ.MAGIC_RESPONSE_PARM]
+        del data[RabbitMQ.MAGIC_RESPONSE_PARM]
         channel.basic_ack(delivery_tag=method.delivery_tag)
         return data
 
