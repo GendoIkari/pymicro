@@ -20,4 +20,4 @@ class EndPoint:
         response = self.function(**request)
         assert serializable(response, 'An endpoint must return a serializable object')
 
-        return self.protocol.process_response(response)
+        return self.protocol.process_response(response, *args, **kwargs)
