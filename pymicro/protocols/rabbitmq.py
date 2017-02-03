@@ -10,10 +10,8 @@ class RabbitMQ:
         self.temporary_response_queue = None
         self.mq_connection = pika.BlockingConnection(parms)
         self.mq_channel = self.mq_connection.channel()
-        self.endpoints = []
 
     def setup_serve(self, endpoints):
-        self.endpoints = endpoints
         for endpoint in endpoints:
             self.mq_channel.queue_declare(queue=endpoint.name)
             self.mq_channel.basic_consume(endpoint, queue=endpoint.name)
@@ -62,5 +60,4 @@ class RabbitMQ:
         self.mq_channel.start_consuming()
 
     def close(self):
-        self.endpoints = []
         self.mq_connection.close()
