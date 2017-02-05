@@ -40,7 +40,7 @@ class RabbitMQ:
         self.mq_channel.start_consuming()
         return json.loads(response.body.decode("utf-8"))
 
-    def process_request(self, endpoint, channel, method, properties, body):
+    def request_args(self, endpoint, channel, method, properties, body):
         data = json.loads(body.decode("utf-8"))
         self.temporary_response_queue = data[RabbitMQ.MAGIC_RESPONSE_PARM]
         del data[RabbitMQ.MAGIC_RESPONSE_PARM]

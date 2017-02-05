@@ -26,7 +26,7 @@ class HTTP:
         url = '{}://{}/{}'.format(schema, address, endpoint)
         return requests.post(url, json=kwargs).json()
 
-    def process_request(self, endpoint):
+    def request_args(self, endpoint):
         return request.get_json()
 
     def process_response(self, payload):
