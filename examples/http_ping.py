@@ -13,7 +13,7 @@ def ping(delay):
         protocol=HTTP(host='localhost', port=5001)
     )
 
-    now = datetime.datetime.now()
+    now = datetime.datetime.now().isoformat()
     then = pong.pong(delay=delay)['time']
 
     return {

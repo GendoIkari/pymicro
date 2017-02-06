@@ -12,7 +12,7 @@ service = Service(
 def pong(delay):
     time.sleep(delay)
     return {
-        'time': datetime.datetime.now(),
+        'time': datetime.datetime.now().isoformat(),
     }
 
 if __name__ == '__main__':
