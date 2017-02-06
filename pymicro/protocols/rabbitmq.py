@@ -1,5 +1,6 @@
 import pika
 import uuid
+import traceback
 from pymicro.message import Message
 
 class RabbitMQ:
@@ -57,7 +58,14 @@ class RabbitMQ:
         )
 
     def run(self):
-        self.mq_channel.start_consuming()
+        while 1:
+            try:
+                self.mq_channel.start_consuming()
+            except Exception as err:
+                if isinstance(err, KeyboardInterrupt):
+                    raise
+                traceback.print_exc()
+
 
     def close(self):
         self.mq_connection.close()
