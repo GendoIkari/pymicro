@@ -1,6 +1,10 @@
 import umsgpack
 import itsdangerous
 
+class CorruptedMessageError(Exception):
+    """Exception rased when the message is corrupted."""
+    pass
+
 class Message:
     @staticmethod
     def pack(obj, secret=None):
@@ -14,4 +18,9 @@ class Message:
     def unpack(data, secret=None):
         if secret:
             data = itsdangerous.Signer(secret).unsign(data)
-        return umsgpack.unpackb(data)
+
+        message = umsgpack.unpackb(data)
+        if not isinstance(message, dict):
+            raise CorruptedMessageError('Deserialized garbage')
+
+        return message
