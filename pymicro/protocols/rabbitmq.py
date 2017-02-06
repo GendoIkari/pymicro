@@ -1,15 +1,16 @@
 import pika
 import uuid
-import umsgpack
+from pymicro.message import Message
 
 class RabbitMQ:
     MAGIC_RESPONSE_PARM = '_pymicro_response_queue'
-    def __init__(self, url):
+    def __init__(self, url, secret=None):
         parms = pika.URLParameters(url)
         self.url = url
         self.temporary_response_queue = None
         self.mq_connection = pika.BlockingConnection(parms)
         self.mq_channel = self.mq_connection.channel()
+        self.secret = secret
 
     def setup_serve(self, endpoints):
         for endpoint in endpoints:
@@ -29,19 +30,20 @@ class RabbitMQ:
         self.mq_channel.queue_declare(queue=response_queue)
         self.mq_channel.queue_declare(queue=endpoint)
 
+        message = Message.pack(kwargs, self.secret)
         self.mq_channel.basic_publish(
             exchange='',
             routing_key=endpoint,
-            body=umsgpack.packb(kwargs),
+            body=message,
         )
 
         response = WaitResponse()
         self.mq_channel.basic_consume(response, queue=response_queue)
         self.mq_channel.start_consuming()
-        return umsgpack.unpackb(response.body)
+        return Message.unpack(response.body, self.secret)
 
     def request_args(self, endpoint, channel, method, properties, body):
-        data = umsgpack.unpackb(body)
+        data = Message.unpack(body, self.secret)
         self.temporary_response_queue = data[RabbitMQ.MAGIC_RESPONSE_PARM]
         del data[RabbitMQ.MAGIC_RESPONSE_PARM]
         channel.basic_ack(delivery_tag=method.delivery_tag)
@@ -51,7 +53,7 @@ class RabbitMQ:
         self.mq_channel.basic_publish(
             exchange='',
             routing_key=self.temporary_response_queue,
-            body=umsgpack.packb(payload),
+            body=Message.pack(payload, self.secret),
         )
 
     def run(self):

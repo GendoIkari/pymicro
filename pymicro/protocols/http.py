@@ -1,12 +1,13 @@
 from flask import Flask, jsonify, request
-import umsgpack
+from pymicro.message import Message
 import requests
 
 class HTTP:
-    def __init__(self, host=None, port=None, ssl=False):
+    def __init__(self, host=None, port=None, ssl=False, secret=None):
         self.host = host
         self.port = port
         self.ssl = ssl
+        self.secret = secret
 
     def setup_serve(self, endpoints):
         self.app = Flask(__name__)
@@ -25,17 +26,18 @@ class HTTP:
         schema = 'https' if self.ssl else 'http'
         address = self.host + ':' + str(self.port)
         url = '{}://{}/{}'.format(schema, address, endpoint)
-        return umsgpack.unpackb(requests.post(
+        message = Message.pack(kwargs, self.secret)
+        return Message.unpack(requests.post(
             url,
-            data=umsgpack.packb(kwargs),
+            data=message,
             headers={'Content-Type': 'application/octet-stream'}
-        ).content)
+        ).content, self.secret)
 
     def request_args(self, endpoint):
-        return umsgpack.unpackb(request.data)
+        return Message.unpack(request.data, self.secret)
 
     def process_response(self, payload):
-        return umsgpack.packb(payload)
+        return Message.pack(payload, self.secret)
 
     def run(self):
         self.app.run(
