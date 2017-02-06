@@ -5,7 +5,7 @@ import datetime
 
 service = Service(
     name='pong',
-    protocol=HTTP(port=5001),
+    protocol=HTTP(port=5001, secret='123'),
 )
 
 @service.endpoint

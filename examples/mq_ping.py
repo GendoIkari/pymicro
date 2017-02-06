@@ -11,7 +11,10 @@ service = Service(
 @service.endpoint
 def ping(delay):
     pong = RemoteService(
-        protocol=RabbitMQ(url='amqp://'),
+        protocol=RabbitMQ(
+            url='amqp://',
+            secret='123',
+        ),
     )
 
     now = datetime.datetime.now().isoformat()

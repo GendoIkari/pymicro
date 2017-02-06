@@ -10,7 +10,7 @@ service = Service(
 @service.endpoint
 def ping(delay):
     pong = RemoteService(
-        protocol=HTTP(host='localhost', port=5001)
+        protocol=HTTP(host='localhost', port=5001, secret='123')
     )
 
     now = datetime.datetime.now().isoformat()
