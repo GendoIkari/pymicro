@@ -15,7 +15,7 @@ pip install pymicro
 Once .pypirc is properly setup type in order to deploy a new version:
 
 - Create a new tag on github
-- Update setup.py
+- Update setup.py (version + dependencies)
 - Upload the new version:
 ```
 python setup.py sdist upload -r pypi
