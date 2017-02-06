@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+import umsgpack
 import requests
 
 class HTTP:
@@ -24,13 +25,17 @@ class HTTP:
         schema = 'https' if self.ssl else 'http'
         address = self.host + ':' + str(self.port)
         url = '{}://{}/{}'.format(schema, address, endpoint)
-        return requests.post(url, json=kwargs).json()
+        return umsgpack.unpackb(requests.post(
+            url,
+            data=umsgpack.packb(kwargs),
+            headers={'Content-Type': 'application/octet-stream'}
+        ).content)
 
     def request_args(self, endpoint):
-        return request.get_json()
+        return umsgpack.unpackb(request.data)
 
     def process_response(self, payload):
-        return jsonify(payload)
+        return umsgpack.packb(payload)
 
     def run(self):
         self.app.run(
