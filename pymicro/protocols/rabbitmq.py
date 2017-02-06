@@ -1,6 +1,6 @@
 import pika
 import uuid
-import json
+import umsgpack
 
 class RabbitMQ:
     MAGIC_RESPONSE_PARM = '_pymicro_response_queue'
@@ -32,16 +32,16 @@ class RabbitMQ:
         self.mq_channel.basic_publish(
             exchange='',
             routing_key=endpoint,
-            body=json.dumps(kwargs),
+            body=umsgpack.packb(kwargs),
         )
 
         response = WaitResponse()
         self.mq_channel.basic_consume(response, queue=response_queue)
         self.mq_channel.start_consuming()
-        return json.loads(response.body.decode("utf-8"))
+        return umsgpack.unpackb(response.body)
 
     def request_args(self, endpoint, channel, method, properties, body):
-        data = json.loads(body.decode("utf-8"))
+        data = umsgpack.unpackb(body)
         self.temporary_response_queue = data[RabbitMQ.MAGIC_RESPONSE_PARM]
         del data[RabbitMQ.MAGIC_RESPONSE_PARM]
         channel.basic_ack(delivery_tag=method.delivery_tag)
@@ -51,7 +51,7 @@ class RabbitMQ:
         self.mq_channel.basic_publish(
             exchange='',
             routing_key=self.temporary_response_queue,
-            body=json.dumps(payload),
+            body=umsgpack.packb(payload),
         )
 
     def run(self):
